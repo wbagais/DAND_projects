@@ -1,0 +1,731 @@
+---
+title: "RED WINE QUALITY"
+output:
+  html_document:
+    fig_width: 15
+    fig_height: 8
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    theme: united
+
+---
+========================================================
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(fig.width = 9, fig.hight=5, fig.path='figs/', fig.align = 'center', tidy =TRUE, ech = FALSE, warning=FALSE, message=FALSE)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+# Load all of the packages that you end up using in your analysis in this code
+# chunk.
+
+# Notice that the parameter "echo" was set to FALSE for this code chunk. This
+# prevents the code from displaying in the knitted HTML output. You should set
+# echo=FALSE for all code chunks in your file, unless it makes sense for your
+# report to show the code that generated a particular plot.
+
+# The other parameters for "message" and "warning" should also be set to FALSE
+# for other code chunks once you have verified that each plot comes out as you
+# want it to. This will clean up the flow of your report.
+
+library(ggplot2)
+library(GGally)
+library(dplyr) 
+
+
+```
+
+```{r echo=FALSE, Load_the_Data}
+# Load the Data
+rw <- read.csv('redWineQuality.csv',  row.names = 'X')
+head(rw)
+```
+
+> This report contains red wines data with 11 variables for red wine chemical properties and one variable for expert quality rating between 0 (very bad) and 10 (very excellent). Using this data, we will try to find which chemical properties influence the quality of red wines?
+
+
+# Univariate Plots Section
+
+
+```{r echo=FALSE, Univariate_Plots_dim}
+dim(rw)
+```
+
+
+```{r echo=FALSE, Univariate_Plots_str}
+str(rw)
+```
+> This data contains 12 variables and 1599 observation. All the variables are numeric
+
+```{r echo=FALSE, Univariate_Plots_summary}
+summary(rw)
+```
+
+> The summary for the each variable.
+
+```{r echo=FALSE, Univariate_Plots_quality_quality}
+qplot(quality, data = rw, 
+      ylab = 'Count',
+      xlab = 'Quality') 
+```
+
+```{r echo=FALSE, quality.level}
+#create new cloumn "quality.level" 
+rw$quality.level[rw$quality >=9] <- 'excellent'
+rw$quality.level[rw$quality <=8 & rw$quality >=7] <- 'very_good'
+rw$quality.level[rw$quality <=6 & rw$quality >=5] <- 'good'
+rw$quality.level[rw$quality <=4 & rw$quality >=3] <- 'Bad'
+rw$quality.level[rw$quality <=2] <- 'Bad'
+
+table(rw$quality.level)
+
+```
+
+> The quality range is between 3 and 8 with most of the rating in the median (6 or 7) values. 
+I create a new column maned quality.level. This column divided the data into 5 groups (this data set contain 3 groups only).
+
+```{r echo=FALSE, Univariate_Plots_fixed.acidity}
+
+qplot(fixed.acidity, data = rw, binwidth =0.25,
+      ylab = 'Count') +
+  ylab(expression(Fixed~Acidity~(g/dm^{3}))) 
+
+```
+
+> The fixed acidity is right skewed with the highest values around 7.
+
+```{r echo=FALSE, Univariate_Plots_volatile.acidity}
+qplot(volatile.acidity, data = rw,
+      binwidth = 0.005,
+      ylab = 'Count', 
+      xlab = 'Volatile Acidity',
+      color = I('black'), fill = I('#099DD9'))
+
+```
+
+```{r echo=FALSE, Univariate_Plots_volatile.acidity2}
+
+summary(rw$volatile.acidity)
+qplot(volatile.acidity, data = rw,
+      binwidth = 0.005,
+      ylab = 'Count', 
+      xlab = 'Volatile Acidity',
+      color = I('black'), fill = I('#099DD9')) + 
+  scale_x_continuous(limits = c(0.1200, 1), breaks = seq(0.1200, 1,.1))
+
+```
+
+> In the second plot I limited the values to 1 to have a closer look to the data. Most of the data is between 0.3 and 0.6. 
+
+
+```{r echo=FALSE, Univariate_Plots_citric.acid}
+qplot(citric.acid, data = rw,
+      binwidth = 0.0025,
+      ylab = 'Count',
+      xlab = 'Citric Acid')
+
+```
+
+```{r echo=FALSE, Univariate_Plots_citric.acid2}
+rw[rw$citric.acid>= 1, ]
+qplot(citric.acid, data = subset(rw, citric.acid< 1),
+      binwidth = 0.0025,
+      ylab = 'Count',
+      xlab = 'Citric Acid')
+
+```
+
+>There is a lot of data with 0.0 value in the Citric Acid. Also, there is another peak in 0.49. 
+The second plot I subtract the value of 1.
+
+
+```{r echo=FALSE, Univariate_Plots_residual.sugar}
+
+qplot(residual.sugar, data = rw,
+      ylab = 'Count',
+      xlab = 'Residual Sugar') 
+
+```
+
+```{r echo=FALSE, Univariate_Plots_residual.sugar2}
+summary(rw$residual.sugar)
+qplot(residual.sugar, data = rw, binwidth = 0.09,
+      ylab = 'Count',
+      xlab = 'Residual Sugar') + 
+  coord_trans(x = "log10") +
+  scale_x_continuous(breaks = seq(0,15.500, 0.5 ))
+
+```
+
+```{r echo=FALSE, Univariate_Plots_residual.sugar_table}
+table(rw$residual.sugar)
+```
+
+```{r echo=FALSE, sugar.level}
+rw$sugar.level[rw$residual.sugar >= 12] <- 'very_sweet'
+rw$sugar.level[rw$residual.sugar < 12 & rw$residual.sugar >= 3] <- 'sweet'
+rw$sugar.level[rw$residual.sugar < 3 & rw$residual.sugar >= 1.2] <- 'off_dry'
+rw$sugar.level[rw$residual.sugar < 1.2 ] <- 'dry'
+
+table(rw$sugar.level)
+
+```
+
+```{r echo=FALSE, Univariate_Plots_sugar.level}
+qplot(sugar.level, data = rw)
+```
+
+> When we take the log for the plot, we can see that there are a lot of values without or with very low data. The peak of the data is around 2. After 4 the count of the data per value is less than 10.
+To have better view for the sugar level I created a new column "sugar.level" based on wine folly website (https://winefolly.com/review/sugar-in-wine-chart/) I divided the sugar level into:
+dry --> below 1.2
+off-dry --> 1.2 - 3
+sweet --> 3 - 12
+very sweet --> above 12
+based on the new sugar levels, most of the wine has off dry sugar level flowed by sweet.
+
+
+```{r echo=FALSE, Univariate_Plots_chlorides}
+qplot(chlorides, data = rw,
+      ylab = 'Count',
+      xlab = 'Chlorides') +
+  scale_x_continuous(breaks = seq(0.01200, 0.61100, .05))
+
+```
+
+```{r echo=FALSE, Univariate_Plots_chlorides2}
+summary(rw$chlorides)
+qplot(chlorides, data = rw,
+      ylab = 'Count',
+      xlab = 'Chlorides') +
+  scale_x_log10(breaks = seq(0.01200, 0.61100, .05))
+
+```
+
+>The second plot shows the log10 of the data where it better shows the outliers. Most of the data id between 0.06 and 0.112.
+
+
+```{r echo=FALSE, Univariate_Plots_free.sulfur.dioxide}
+summary(rw$free.sulfur.dioxide)
+qplot(free.sulfur.dioxide, data = rw,
+      ylab = 'Count',
+      xlab = 'Free Sulfur Dioxide')
+
+```
+
+```{r echo=FALSE, Univariate_Plots_total.sulfur.dioxide}
+
+qplot(total.sulfur.dioxide, data = rw,
+      ylab = 'Count',
+      xlab = 'Total Sulfur Dioxide')
+
+```
+
+```{r echo=FALSE, Univariate_Plots_total.sulfur.dioxide2}
+
+qplot(total.sulfur.dioxide, data = rw,
+      ylab = 'Count',
+      xlab = 'Total Sulfur Dioxide') +
+  scale_x_continuous(limits = c(0, 175))
+
+```
+
+> Both of Free Sulfur Dioxide and Total Sulfur Dioxide are right skewed. 
+limiting the Total Sulfur Dioxide data to 175  give us better image for the data.
+
+```{r echo=FALSE, Univariate_Plots_density}
+
+summary(rw$density)
+qplot(density, data = rw,
+      ylab = 'Count') +
+  xlab(expression(Density~(g/cm^{3}))) +
+  scale_x_continuous(breaks = seq(0.9901,1.0037,0.001))
+
+```
+
+> The Density has a normal distributed shape around 0.9965
+
+```{r echo=FALSE, Univariate_Plots_pH}
+summary(rw$pH)
+qplot(pH, data = rw,
+      ylab = 'Count') + 
+  scale_x_continuous(breaks = seq(2.5,4.010, 0.2))
+```
+
+
+```{r echo=FALSE, pH.level}
+rw$pH.level[rw$pH < 3.3] <- 'low'
+rw$pH.level[rw$pH >= 3.3 & rw$pH <=3.6] <- 'moderate'
+rw$pH.level[rw$pH > 3.6] <- 'high'
+
+result <- rw %>%
+  group_by(rw$pH.level) %>%
+  summarise(n = n())
+result
+```
+
+```{r echo=FALSE, Multivariate_Plots-pH.level}
+qplot(pH.level, data = rw,
+      ylab = 'Count') 
+```
+
+> pH values have a normal distributed shape.
+To better understand the pH affect I create a new column "pH.level" based on winespectator website (https://www.winespectator.com/drvinny/show/id/5035):
+3.3 to 3.6 --> best 
+lower than 3.3 --> low
+higher than 3.6 --> high
+most of the pH values are moderate followed by low.
+
+
+```{r echo=FALSE, Univariate_Plots_sulphates}
+
+qplot(sulphates, data = rw,
+      ylab = 'Count',
+      xlab = 'Sulphates')
+print(summary(rw$sulphates))
+```
+
+> The graph is skewed to the right. The majority of data is between 0.5 and 0.7.
+
+```{r echo=FALSE, Univariate_Plots_alcohol}
+
+qplot(alcohol, data = rw,
+      ylab = 'Count',
+      xlab = 'Alcohol')
+
+```
+
+> The shape of the data is right skewed with the peak around 7. 
+
+# Univariate Analysis
+
+### What is the structure of your dataset?
+there are 1599 red wine records with 11 column for its chemical characteristics (fixed.acidity, volatile.acidity, citric.acid, residual.sugar, Chlorides, free.sulfur.dioxide, total.sulfur.dioxide, density, pH, sulphates, alcohol) and one column represent expert rating (quality). All the variables are numeric. Then I create 3 more columns (quality.level, sugar.level, & pH.level)
+
+Other observations:
+* Most of the quality rating is in the median (6 or 7) with minimum of 3 and maximum of 8
+* There is a lot of data with 0.0 value in the Citric Acid.
+* Most sugar values are around 2
+* The Density and pH values are normally distributed
+* Fixed acidity, sulphates, Free Sulfur Dioxide, and Total Sulfur Dioxide are right skewed.
+
+### What is/are the main feature(s) of interest in your dataset?
+The main feature in the data set is the quality. I would like to see how other features affect it. 
+
+### What other features in the dataset do you think will help support your investigation into your feature(s) of interest? 
+I think sugar, citric  acid, and alcohol will effect the quality.
+
+### Did you create any new variables from existing variables in the dataset?
+Yes, I create 3 new columns: 
+
+quality.level: based on the quality column I divided the quality inti:
+quality --> quality.level
+ 1 - 2  --> very bad (no values)
+ 3 - 4  --> Bad
+ 5 - 6  --> Good
+ 7 - 8  --> very good
+ 9 - 10 --> excellent (no values)
+ 
+sugar.level: based on wine folly website (https://winefolly.com/review/sugar-in-wine-chart/) I divided the sugar values into:
+dry --> below 1.2
+off-dry --> 1.2 - 3
+sweet --> 3 - 12
+very sweet --> above 12
+
+pH.level: based on winespectator website (https://www.winespectator.com/drvinny/show/id/5035) I divided the pH values into:
+3.3 to 3.6 --> best 
+lower than 3.3 --> low
+higher than 3.6 --> high
+
+### Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
+I log-transformed the residual sugar to have better view of the plot, we can see that there are alot of values without or with very low data.
+I log-transformed the Chlorides plot where it better shows the outliers and the gap after the first value 0.012.
+
+# Bivariate Plots Section
+
+```{r echo=FALSE, Bivariate_Plots_ggpairs}
+ggpairs(rw)
+```
+
+```{r echo=FALSE, Bivariate_plots_fixed.acidity}
+
+ggplot(aes(x=quality.level, y=fixed.acidity, group = 1), data=rw)+ 
+  geom_jitter(alpha = 0.15, color ='orange') +
+  ylab(expression(Fixed~Acidity~(g/dm^{3}))) + 
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.05), linetype = 2, color = 'blue') +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.5), linetype = 1, color = 'red') +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.95), linetype = 2, color = 'blue')
+
+```
+scatter plot for fixed acidity per quality group. 
+The red line represents the mean. The blue lines represent 0.05 and 0.95 quantiles
+
+```{r echo=FALSE, Bivariate_Plots_fixed.acidity2}
+ggplot(aes(x = quality.level, y = fixed.acidity ), data = rw) +
+  ylab(expression(Fixed~Acidity~(g/dm^{3}))) +
+  geom_boxplot()
+```
+
+Box plot for fixed acidity per quality level 
+
+```{r echo=FALSE, Bivariate_plots_volatile.acidity}
+
+ggplot(aes(x=quality.level, y=volatile.acidity, group = 1), data=rw)+ 
+  geom_jitter(alpha = 0.15, color ='orange') +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.05), linetype = 2, color = 'blue') +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.5), linetype = 1, color = 'red') +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.95), linetype = 2, color = 'blue')
+
+```
+scatter plot for volatile acidity per quality level 
+
+```{r echo=FALSE, Bivariate_Plots_citric.acid}
+ggplot(aes(x = quality.level, y = citric.acid ), data = rw) + geom_boxplot()
+```
+
+box plot for citric acid per quality level 
+
+
+>In both graphs the blue lines represent the 0.05 & 0.95 quantiles. The red line represents the mean (0.5 quintile).
+The lower the volatile acidity the higher the quality. 
+For the fixed acidity and citric acid based on the boxplots the higher the value the better the quality.
+
+
+```{r echo=FALSE, Bivariate_Plots_residual.sugar}
+ggplot(aes(x = quality.level, y =  residual.sugar , group = 1) ,data = rw) + 
+  scale_y_log10()+
+  geom_jitter(alpha = 0.15) +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.05), linetype = 2, color = 'blue') +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.5), linetype = 1, color = 'red') +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.95), linetype = 2, color = 'blue')
+
+
+```
+The blue lines show the 0. 95 quintile and 0.05 quantile. The red line shows the mean (0.5 quintile)
+
+```{r echo=FALSE, Bivariate_Plots_residual.sugar2}
+ggplot(aes( x=residual.sugar), data=rw)+ 
+  scale_y_log10()+
+  geom_histogram(color = 'black', fill ='orange') +
+  facet_wrap(~quality.level, ncol = 3)
+```
+
+
+```{r echo=FALSE, Bivariate_Plots_residual.sugar3}
+ggplot(aes(x = quality.level, y =sugar.level), data = rw) +
+  geom_jitter(alpha = 0.5)
+
+```
+
+>most of the very good wine id off-dry which mean the residual sugar is below 3 and higher than 1.2. 
+generally speaking most wine have off-dry or sweet regardless to it quality.
+
+
+```{r echo=FALSE, Bivariate_Plots_chlorides}
+
+ggplot(aes(x = quality.level, y =chlorides), data = rw) +
+  geom_jitter(alpha = 0.25) +
+  scale_y_log10() 
+```
+
+
+```{r echo=FALSE, Bivariate_Plots_chlorides2}
+summary(rw$chlorides)
+ggplot(aes(x = quality.level, y =chlorides), data = rw) +
+  geom_jitter(alpha = 0.25) +
+  scale_y_log10() +
+  coord_cartesian(ylim = c(0.03000,0.2000))
+```
+
+
+```{r echo=FALSE, Bivariate_Plots_chlorides3}
+summary(rw$chlorides)
+ggplot(aes(x = quality.level, y =chlorides), data = rw) +
+  geom_boxplot() +
+  scale_y_log10()
+```
+
+>The mean of very good quality wine is lower than the rest. 
+
+```{r echo=FALSE, Bivariate_Plots_free.sulfur.dioxide}
+summary(rw$free.sulfur.dioxide)
+ggplot(aes(x = quality.level, y= free.sulfur.dioxide), data = rw) +
+  geom_boxplot()
+```
+
+Boxblot for  the free sulfur dioxide after and the qyality level 
+
+```{r echo=FALSE, Bivariate_Plots_free.sulfur.dioxide2}
+summary(rw$free.sulfur.dioxide)
+ggplot(aes(x = quality.level, y= free.sulfur.dioxide), data = rw) +
+  geom_boxplot() +
+  scale_y_log10()
+```
+
+Boxblot for  the log of free sulfur dioxide after and the qyality level 
+
+```{r echo=FALSE, Bivariate_Plots_total.sulfur.dioxide}
+summary(rw$total.sulfur.dioxide)
+ggplot(aes(x = quality.level, y= total.sulfur.dioxide), data = rw) +
+  geom_boxplot() 
+```
+Boxblot for  the total sulfur dioxide after and the qyality level 
+
+```{r echo=FALSE, Bivariate_Plots_total.sulfur.dioxide1}
+summary(rw$total.sulfur.dioxide)
+ggplot(aes(x = quality.level, y= total.sulfur.dioxide), data = rw) +
+  geom_boxplot() +
+  scale_y_log10()
+```
+Boxblot for  the log of total sulfur dioxide after and the qyality level 
+
+> Both the total and free sulfur dioxide having a low value is better. 
+
+```{r echo=FALSE, Bivariate_Plots_density}
+ggplot(aes(x = quality.level , y= density), data = rw) +
+  ylab(expression(Density~(g/cm^{3}))) +
+  geom_boxplot()
+```
+> also for density the very good quality has the lowest mean
+
+```{r echo=FALSE, Bivariate_Plots_pH}
+ggplot(aes(x = quality.level , y= pH), data = rw) +
+  geom_boxplot()
+```
+
+
+```{r echo=FALSE, Bivariate_Plots_pH1}
+ggplot(aes(x = quality.level , y= pH.level), data = rw) +
+  geom_jitter ()
+```
+
+> The bad quality has the highest mean and the very good quality has the lowest mean. 
+very good quality mean is around 3.25. 
+Most of the pH values is low or moderate
+
+```{r echo=FALSE, Bivariate_Plots_pH2}
+summary(rw$pH)
+```
+
+```{r echo=FALSE, Bivariate_Plots_sulphates }
+ggplot(aes(x = quality.level , y= sulphates), data = rw) +
+  geom_boxplot()
+```
+> In the sulphates the very good has the highest mean. 
+
+```{r echo=FALSE, Bivariate_Plots_alcohol }
+ggplot(aes(x = quality.level , y= alcohol), data = rw) +
+  geom_boxplot()
+```
+
+> clearly that the higher quality has the highest mean of alcohol
+
+# Bivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?
+I observe the relationship between the quality group and all other variable.
+
+fixed acidity, volatile acidity, and citric acid:
+Both fixed acidity and citric acid the mean increases in better quality.
+for volatile acidity is the opposite, the mean decreases in better quality. 
+
+residual sugar:
+Most of the wine values id under the off-dry followed by sweet. There is not a specific characteristic to distinguish between good and bad wine.
+
+chlorides: 
+The mean of very good quality wine is lower than the rest.
+
+total sulfur dioxide and free sulfur dioxide:
+For both the total and free sulfur dioxide, having a lower value is better. 
+
+density and pH:
+For both the very good quality has the lowest mean.
+
+sulphates:
+the better the quality the higher the mean
+
+alcohol:
+the better the quality the higher the mean
+
+### Did you observe any interesting relationships between the other features (not the main feature(s) of interest)?
+No.
+
+### What was the strongest relationship you found?
+the increase in alcohol, sulphates, and citric acid with quality group 
+and the decrease in volatile acidity with the quality group.
+
+
+
+# Multivariate Plots Section
+
+```{r echo=FALSE, Multivariate_Plots_alcohol_density}
+ggplot(aes(x = alcohol, y =density, colour = quality.level), data = rw) +
+  geom_point() +
+  ylab(expression(Density~(g/cm^{3}))) + 
+  geom_line(stat = 'summary', fun.y = 'mean')
+  scale_x_log10()
+```
+
+```{r echo=FALSE, Multivariate_Plots_alcohol_density1}
+ggplot(aes(x = alcohol, y =density), data = rw) +
+  geom_point() +
+  ylab(expression(Density~(g/cm^{3}))) +
+  facet_wrap(~quality.level, ncol = 1 )+
+  geom_line(stat = 'summary', fun.y = 'mean')
+  scale_x_log10() 
+```
+
+>The higher the alcohol level the lower the density. 
+
+```{r echo=FALSE, Multivariate_Plots_alcohol_residual.sugar}
+ggplot(aes(x = residual.sugar   , y = alcohol, color = quality.level), data = rw) +
+  geom_jitter()
+```
+
+```{r echo=FALSE, Multivariate_Plots_alcohol_sugar.level}
+ggplot(aes(x = sugar.level   , y = alcohol, color = quality.level), data = rw) +
+  geom_jitter()
+```
+
+>The higher the sugar value the lower the alcohol value. 
+Very good wine has off dry to sweet sugar level and higher value of alcohol
+
+```{r echo=FALSE, Multivariate_Plots_alcohol_sugar.level_density}
+ggplot(aes(x = alcohol  , y =density , color = sugar.level ), data = rw) +
+  geom_point() +
+  ylab(expression(Density~(g/cm^{3}))) +
+  facet_wrap(~quality.level, ncol=1)
+
+```
+
+>The very sweet wine shows in good quality, the alcohol level is low for the very sweet wine.
+The density decreases if the sweetness level decrease. 
+
+
+```{r echo=FALSE, Multivariate_Plots_citric.acid_volatile.acidity_pH.level}
+ggplot(aes(x = citric.acid , y = volatile.acidity, color = pH.level ), data = rw) +
+  geom_point(alpha= 0.5) +
+  scale_x_continuous(limits = c(0,.8))+
+  facet_wrap(~quality.level, ncol = 1) +
+  geom_line(stat = 'summary', fun.y = 'mean')
+```
+
+```{r echo=FALSE, Multivariate_Plots_pH.level_volatile.acidity}
+print('The mean of volatile acidity for low pH level:')
+summary(subset(rw, pH.level == 'low')$volatile.acidity)
+
+print('The mean of volatile acidity for moderate pH level:')
+summary(subset(rw, pH.level == 'moderate')$volatile.acidity)
+
+print('The mean of volatile acidity for high pH level:')
+summary(subset(rw, pH.level == 'high')$volatile.acidity)
+```
+
+> I removed one value which has citric acid value equal to 1. 
+the number of vales with high pH values is very small (48) specially in the very good wine. 
+In the very good quality, the lower the pH level the lower the volatile acidity mean and the higher the citric acid value. 
+
+
+```{r echo=FALSE, Multivariate_Plots_free.sulfur.dioxide_sulphates}
+ggplot(aes(x = free.sulfur.dioxide , y = sulphates, color = quality.level ), 
+       data = rw)+
+  geom_point()+
+  geom_line(stat = 'summary', fun.y = 'mean')
+  
+```
+
+
+```{r echo=FALSE, Multivariate_Plots_free.sulfur.dioxide_sulphates1}
+ggplot(aes(x = free.sulfur.dioxide , y = sulphates, color = quality.level ), data = rw) +
+  geom_boxplot()+
+  scale_x_continuous(limits = c(0,40))
+
+summary(subset(rw, quality.level = 'good'))
+```
+> the value for good and very good quality are similar; however, the very good quality has  higher sulphates mean.
+
+
+
+# Multivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the investigation. Were there features that strengthened each other in terms of looking at your feature(s) of interest?
+pH, volatile acidity, and citric  acid:
+* To have very good wine we need to balance the citric  acid value and the pH value. The lowest the pH the higher the citric acid. This relationship is clear in the very good wine only.
+* for very good wine, low pH values have lower volatile acidity.
+* The lower the pH level the lower the volatile acidity means.
+
+Free sulfur dioxide, sulphates, & quality group:
+* the very good quality has highest sulphates mean
+* there is NO relationship between the free sulfur dioxide and the sulphates.
+
+Density, alcohol, & sugar level:
+* The density decreases if the sweetness level decrease. 
+* The alcohol level is low for the very sweet wine
+* Having a better wine mean having higher alcohol level and off-dry to sweet level of sugar
+
+### Were there any interesting or surprising interactions between features?
+To have very good wine we need to balance the citric  acid value and the pH value. 
+
+### OPTIONAL: Did you create any models with your dataset? Discuss the strengths and limitations of your model.
+
+------
+
+# Final Plots and Summary
+
+### Plot One
+```{r echo=FALSE, Plot_One}
+ggplot(aes(x = quality.level, y =chlorides), data = rw) +
+  geom_boxplot() +
+  scale_y_log10()
+```
+
+
+### Description One
+The chlorides percentage is responsible for the saltness of the wine.
+The plot shows that the very good wine has lower mean.
+ 
+
+### Plot Two
+```{r echo=FALSE, Plot_Two}
+ggplot(aes(x = sugar.level   , y = alcohol, color = quality.level), data = rw) +
+  geom_jitter()
+```
+
+### Description Two
+* Better quality has higher amount of alcohol
+* Most of the wines under off dry sugar level
+* The sweeter the wine the lower the alcohol value
+* Very good wine has off-dry to sweet level of sugar and has the highest mean of alcohol value.
+
+### Plot Three
+```{r echo=FALSE, Plot_Three}
+ggplot(aes(x = citric.acid , y = volatile.acidity, color = pH.level ), data = rw) +
+  geom_point(alpha= 0.5) +
+  scale_x_continuous(limits = c(0,.8))+
+  facet_wrap(~quality.level, ncol = 1) +
+  geom_line(stat = 'summary', fun.y = 'mean')
+```
+
+### Description Three
+volatile acidity gives a vinegar taste to the wine, for better wine this value decreases
+citric acid gives some freshness and flavor to the wine, for better wine this value increases
+pH, the closer the value to 0 the more acidic. Very good wine has the lower mean
+To have very good wine we need to balance the citric  acid value and the pH value. The lowest the pH the higher the citric acid. This relationship is clear in the very good wine only.
+
+------
+
+# Reflection
+This data contains 1500 red wine records with 11 columns for its chemical characteristics and 1 column for expert rating. I create 3 more columns: quality level, for more classification for the quality rating, sugar level, based on the folly website I divided the sugar values into 4 levels, pH level, based on wine spectator website I divided the pH values into 3 levels. Before I start analysis below short explanation for the chemical characteristics:
+Fixed acidity: most acids, fixed or nonvolatile involved with wine
+Volatile acidity: too much give the taste of vinegar
+Citric acid: give the wine a taste of freshness
+Residual sugar: sugar value (I divide it into levels in suga level column)
+Chlorides: salt
+Free sulfur dioxide: prevent microbial growth and the oxidation of the wine
+Total sulfur dioxide: free + bound sulfur dioxide
+Density: the density of the water based on alcohol and sugar level
+pH: closer to 0 more acidic and closer to 14 more basic 
+Sulphates: antimicrobial and antioxidant 
+ Alcohol: alcohol level
+I plot the variables to better know it distribution. For the quality, most of the wine values are under good quality (5 or 6 rating). For the sugar level, most of the values are under the off dry level. The density and pH values have a normal distribution. Alcohol, sulphates, total sulfur dioxide, free sulfur dioxide, and fixed acidity are right skewed. 
+After that I observed each variable with the quality variable to find of there is a relationship between them. I found that the volatile acidity, chlorides, total and free sulfur dioxide, density, and pH values decrease for better quality. And the fixed acidity, citric acid, sulphates, and alcohol increase with better quality. 
+To Identify if a combined the variables can affect the quality, I used the multivariate analysis and found that for a very good wine quality there is a balance between the citric acid and pH values. The lowest the pH the higher the citric acid. This relationship is clear in the very good wine only. There is other relation between the sugar level and the alcohol value, the higher the sugar level the lower the alcohol value. Having a better wine mean having higher alcohol level and off-dry to sweet level of sugar.
