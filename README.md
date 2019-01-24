@@ -3,7 +3,7 @@ Here I upload my projects from data analysis nano degree from  Udacity
 
 ## project #1: (python)
 Bike share analysis
-Using python I compared the useage of bicycle-sharing system in New York, Chicago, and Qashington
+Using python I compared the usage of the bicycle-sharing system in New York, Chicago, and Washington
 The data provided by Motivate. 
 
 ## project #2: (python)
@@ -13,7 +13,7 @@ tmdb movies dataset contain information about the movies from the mid-60s till 2
 How many movies in each segment?
 What is the relationship between revenue and budget?
 What is the relationship between revenue and runtime?
-What is most produced genre in each generation?
+What is the most produced genre in each generation?
 
 ## project #3: (python)
 Analyze A/B Test Results
@@ -24,10 +24,10 @@ Part III - A regression approach
 
 ## project #4: (python)
 Test a Perceptual Phenomenon
-Analyzing the Stroop Effect Using the t test and A/B test.
+Analyzing the Stroop Effect Using the t-test and A/B test.
 
 ## project #5: (R)
-This report contains red wines data with 11 variables for red wine chemical properties and one variable for expert quality rating between 0 (very bad) and 10 (very excellent). Using this data, I will try to find which chemical properties influence the quality of red wines?
+This report contains red wines data with 11 variables for red wine chemical properties and one variable for experts quality rating between 0 (very bad) and 10 (very excellent). Using this data, I will try to find which chemical properties influence the quality of red wines?
 This project is divided into 5 sections: 
 1 - Univariate Plots Section and analysis section
 2 - Bivariate Plots Section and analysis section
