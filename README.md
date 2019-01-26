@@ -18,9 +18,9 @@ What is the most produced genre in each generation?
 ## project #3: (python)
 Analyze A/B Test Results
 This project is divided into 3 sections:
-Part I - Probability
-Part II - A/B Test
-Part III - A regression approach
+* Part I: Probability
+* Part II: A/B Test
+* Part III: A regression approach
 
 ## project #4: (python)
 Test a Perceptual Phenomenon
@@ -28,14 +28,17 @@ Analyzing the Stroop Effect Using the t-test and A/B test.
 
 ## project #5: (R)
 This report contains red wines data with 11 variables for red wine chemical properties and one variable for experts quality rating between 0 (very bad) and 10 (very excellent). Using this data, I will try to find which chemical properties influence the quality of red wines?
+
 This project is divided into 5 sections: 
-1 - Univariate Plots Section and analysis section
-2 - Bivariate Plots Section and analysis section
-3 - Multivariate Plots Section and analysis section
-4 - Final Plots and Summar 
-5 - Reflection
+* Univariate Plots Section and analysis section
+* Bivariate Plots Section and analysis section
+* Multivariate Plots Section and analysis section
+* Final Plots and Summar 
+* Reflection
+
 The source of the red wine data:
-  P. Cortez, A. Cerdeira, F. Almeida, T. Matos and J. Reis. 
+
+  _P. Cortez, A. Cerdeira, F. Almeida, T. Matos and J. Reis._ 
   Modeling wine preferences by data mining from physicochemical properties.
   In Decision Support Systems, Elsevier, 47(4):547-553. ISSN: 0167-9236.
   Available at: [@Elsevier] http://dx.doi.org/10.1016/j.dss.2009.05.016
