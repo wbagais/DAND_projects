@@ -11900,18 +11900,16 @@ Issues in scope of the projects:</li>
 <li>Using merge method </li>
 </ul>
 </li>
-<li>oConvert (doggo, floofer, pupper, puppo) columns into one column "dog_stage"<ol>
-<li>Since we have a lot of raws that has no record and later on I will delete all raws with None value I create new column named “no_stage” that stove “no_value” for all rows that has no other stage</li>
-<li>The used melt method to convert the columns into rows</li>
-<li>Demove all rows with value None </li>
-<li>Remove column variable</li>
+<li>Convert (doggo, floofer, pupper, puppo) columns into one column "dog_stage"<ol>
+<li>Add all data in one column called "dog_stage"</li>
+<li>remove None form the text</li>
+<li>replace 'doggopupper' to 'doggo,pupper', 'doggofloofer' to 'doggo, floofer', and 'doggopuppo' to 'doggo,puppo'</li>
 </ol>
 </li>
 <li>missing records 2354 instead of 2356<ul>
 <li>delete the rows with missing retweet_count and favorite_count records (18 rows) in <code>twitter_archive_clean</code> table.Using dropna </li>
 </ul>
 </li>
-<li>convert No_value in dog_stage to null using replace method</li>
 <li>Erroneous data type:<ul>
 <li>dog_stage to category</li>
 <li>timestamp to datetime</li>
@@ -11923,6 +11921,7 @@ Issues in scope of the projects:</li>
 </ul>
 </li>
 <li>Change all values in rating_denominator to 10</li>
+<li>converet "" to Null in the dog_stage column</li>
 <li>Since we only have 79 record these two columns are not beneficial. I will drop in_reply_to_user_id and in_reply_to_status_id columns</li>
 </ul>
 <p><strong>For <code>image_predictions</code> table:</strong></p>
